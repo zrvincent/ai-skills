@@ -1,155 +1,170 @@
 ---
-name: seo-marketing-content
+name: marketing-content-writer
 description: >
-  Use this skill to generate SEO-optimized marketing content for websites or social media platforms based on a keyword input. Trigger this skill whenever the user wants to: research a topic online and turn it into marketing content, write blog posts or web pages with SEO structure, create social media captions or posts from keyword research, generate content briefs from web-researched summaries, or produce platform-specific content (Instagram, Facebook, LinkedIn, TikTok, Twitter/X). Always use this skill when the user provides a keyword and wants content written for "web" or "social" output. Also trigger when user says things like "write me content for my website about [topic]", "create social media posts for [keyword]", "research and write marketing content about [topic]", "SEO article for [keyword]", or "generate content for [platform] based on [keyword]".
+  Use this skill whenever the user wants to create SEO-optimized marketing content for websites or
+  social media platforms based on a keyword or topic. Triggers include: "write marketing content",
+  "create SEO content", "generate social media post", "write a blog post about [topic]",
+  "content for [keyword]", "web content", "social content", "Instagram/Facebook/LinkedIn post",
+  or any request to research a topic and turn it into polished marketing copy.
+  Always use this skill when the user provides a keyword + a target platform (web or social).
+  This skill searches the web for current content, summarizes insights, and produces
+  publication-ready output tailored to SEO (for web) or engagement (for social).
 ---
 
-# SEO Marketing Content Skill
+# Marketing Content Writer
 
-Generate research-backed, SEO-optimized marketing content for web or social platforms from a single keyword input.
-
----
-
-## Workflow Overview
-
-1. **Receive inputs** — keyword + output type (`web` or `social` + platform)
-2. **Web research** — search for top-ranking content, competitors, trends
-3. **Summarize findings** — extract key themes, angles, LSI keywords
-4. **Generate content** — apply SEO rules or social best practices per platform
-
----
-
-## Step 1: Parse User Inputs
-
-Identify from the user's message:
-- **Keyword**: the main topic/keyword (e.g., "organic skincare for sensitive skin")
-- **Output type**: `web` or `social`
-- **Platform** (if social): instagram / facebook / linkedin / tiktok / twitter / x
-- **Language/locale** (if specified, default: English)
-- **Tone** (if specified, default: professional but approachable)
-
-If output type is missing, ask: *"Should I create this for a website (SEO article/landing page) or social media? If social, which platform?"*
+A skill that researches a keyword across the web, synthesizes top-ranking content, and produces
+SEO-optimized web copy or social media posts — chosen by a simple `web` or `social` parameter.
 
 ---
 
-## Step 2: Web Research
+## Workflow
 
-Run **3–5 web searches** to gather competitive intelligence:
+### Step 1 – Clarify inputs (if not already provided)
 
+Collect these before proceeding:
+
+| Input | Description | Required |
+|---|---|---|
+| `keyword` | The topic or search term to research | YES |
+| `platform` | `web` (SEO blog/article) or `social` (Instagram / Facebook / LinkedIn / Twitter) | YES |
+| `social_channel` | Which social channel (only needed when platform = social) | If platform = social |
+| `tone` | e.g. professional, casual, inspirational, urgent | Optional (default: professional) |
+| `language` | Output language | Optional (default: English) |
+
+If `keyword` and `platform` are missing, ask for them before starting.
+
+---
+
+### Step 2 – Web Research
+
+Use `web_search` to gather current, authoritative content about the keyword.
+
+**Search strategy:**
+1. Primary search: `{keyword} guide 2024` or `{keyword} tips`
+2. Competitor angle: `best {keyword}` or `{keyword} benefits`
+3. For social: `{keyword} trending` or `{keyword} viral`
+
+Run 3-5 searches to gather diverse perspectives. Use `web_fetch` on 2-3 top results for deeper content when snippets are insufficient.
+
+**Extract and note:**
+- Key themes, facts, statistics, unique angles
+- Commonly used subheadings and structure patterns
+- Gaps or angles competitors miss (differentiation opportunity)
+- Relevant keywords and LSI terms (for SEO)
+
+---
+
+### Step 3 – Content Generation
+
+Branch on `platform`:
+
+#### If `platform = web` → SEO Article/Blog Post
+
+Follow the SEO rules in `references/seo-rules.md`.
+
+Output structure:
 ```
-Search queries to run (adapt to keyword):
-1. "[keyword]" — top-ranking pages
-2. "[keyword] tips / guide / benefits" — content angles
-3. "[keyword] [current year]" — fresh/trending content
-4. "best [keyword] [niche]" — listicle/comparison angles (optional)
-5. "[keyword] site:reddit.com OR site:quora.com" — audience pain points (optional)
-```
-
-For each result, **extract**:
-- Key themes and subtopics covered
-- Commonly used headings (H2/H3 patterns)
-- Notable statistics or data points (paraphrase, do NOT quote verbatim)
-- Audience questions and pain points
-- LSI (Latent Semantic Indexing) keywords — related terms that appear frequently
-
-Compile a **Research Summary** (internal, not shown to user unless asked):
-- Top 3–5 content angles
-- 8–15 LSI/related keywords
-- Key facts and insights (paraphrased)
-- Content gaps (what competitors miss)
-
----
-
-## Step 3: Generate Content
-
-Branch based on output type:
-
-### → If `web`
-
-Read: `references/web-seo-rules.md` for full SEO formatting rules.
-
-**Quick checklist:**
-- [ ] SEO title (50–60 chars, keyword near front)
-- [ ] Meta description (150–160 chars, includes keyword + CTA)
-- [ ] H1 with primary keyword
-- [ ] Introduction with keyword in first 100 words, hook, preview of content
-- [ ] H2/H3 structure covering subtopics (use LSI keywords in headings)
-- [ ] Body: 800–2000 words depending on topic complexity
-- [ ] Include stats, examples, or lists for scannability
-- [ ] Internal link placeholders: [Link: related topic]
-- [ ] CTA section at end
-- [ ] FAQ section (3–5 questions based on "People Also Ask" style)
-- [ ] Keyword density: ~1–2% (natural usage, not stuffed)
-
-**Output format:**
-```
-📄 SEO TITLE: ...
-📝 META DESCRIPTION: ...
----
-[Full article content with H1, H2, H3, body, FAQ, CTA]
----
-🔑 TARGET KEYWORDS USED: [list]
-📊 WORD COUNT: ~XXX words
+[SEO Title] – include primary keyword, under 60 chars
+[Meta Description] – 150-160 chars, keyword + CTA
+[H1] – matches or closely mirrors SEO title
+[Introduction] – hook + keyword in first 100 words
+[H2 sections] – 3-6 sections, each with keyword variations
+[Conclusion + CTA] – summarize + action step
+[Suggested Tags/Keywords] – 5-8 LSI terms
 ```
 
----
+Word count targets:
+- Short article: 600-800 words
+- Standard blog: 1,000-1,500 words (default)
+- Pillar page: 2,000+ words (only if user requests)
 
-### → If `social`
+#### If `platform = social` → Social Media Post
 
-Read: `references/social-platform-rules.md` for platform-specific rules.
+Follow the channel rules in `references/social-rules.md`.
 
-**Quick reference by platform:**
+Channel defaults:
 
-| Platform | Length | Format | Hashtags | Tone |
-|----------|--------|--------|----------|------|
-| Instagram | 138–150 chars (caption) | Hook + value + CTA | 5–10 | Inspiring, visual |
-| Facebook | 40–80 chars optimal | Short + conversational | 1–2 | Friendly, community |
-| LinkedIn | 150–300 chars or long-form 1200–1500 | Professional insight | 3–5 | Thought leadership |
-| Twitter/X | ≤280 chars | Punchy, engaging | 1–2 | Witty or direct |
-| TikTok | Video script: 150–300 words | Hook (0–3s) + body + CTA | 3–7 | Energetic, Gen-Z friendly |
+| Channel | Length | Style |
+|---|---|---|
+| Instagram | 150-300 words | Storytelling, emojis, hashtags |
+| Facebook | 100-200 words | Conversational, question hook |
+| LinkedIn | 200-400 words | Professional insight, no hard sell |
+| Twitter/X | 280 chars max | Punchy, 1-2 hashtags |
+| TikTok caption | 100-150 chars | Casual, trend-aware |
 
-**Output format for social:**
-```
-📱 PLATFORM: [name]
----
-✍️ POST COPY:
-[Post content]
-
-#️⃣ HASHTAGS: [hashtags]
-
-🎯 CTA: [Call to action]
-
-💡 POSTING TIP: [Best time/format tip for this platform]
-```
-
-For TikTok, output a **video script** with:
-- Hook (first 3 seconds)
-- Main content points
-- CTA / ending
+Always include:
+- Hook in line 1 (stops the scroll)
+- Call to action (CTA) near the end
+- 3-10 relevant hashtags (Instagram: up to 10; LinkedIn: 3-5; Twitter: 1-2)
 
 ---
 
-## Step 4: Output & Offer Variations
+### Step 4 – Output Format
 
-After the main content:
-1. **Offer a variation**: "Want a different angle or tone? I can write a [more casual / more authoritative / shorter] version."
-2. **Offer cross-format**: "Should I also create social posts from this web article?" (or vice versa)
-3. **Offer keyword list**: "Want the full LSI keyword list for more content ideas?"
+Present output in this order:
 
----
-
-## Quality Rules (Always Apply)
-
-- **Never plagiarize**: All content must be original. Paraphrase research findings. No direct quotes from sources.
-- **Natural keyword use**: Keywords flow naturally — no keyword stuffing.
-- **Audience-first**: Content must provide genuine value, not just rank.
-- **Accuracy**: Do not invent statistics. If no data found, use general language or omit.
-- **Brand-neutral**: Unless the user specifies a brand/product, keep content generic and adaptable.
+1. **Research Summary** (3-5 bullet points of key insights found)
+2. **Generated Content** (clearly labeled, ready to copy-paste)
+3. **Usage Tips** (1-3 quick notes: best posting time, A/B variation idea, etc.)
 
 ---
 
-## Error Handling
+## Example Calls
 
-- **No search results**: If web search returns nothing useful, inform the user and generate content from Claude's internal knowledge, noting it isn't research-backed.
-- **Ambiguous keyword**: If keyword is too broad (e.g., "shoes"), ask for a narrower focus or niche.
-- **Conflicting platform**: If user says "social" but no platform, default to **Instagram** and note the assumption.
+### Example 1 – Web SEO Article
+
+User prompt:
+> Write web marketing content for keyword "matcha latte benefits"
+
+Claude's process:
+- Searches: "matcha latte benefits guide", "matcha latte health benefits", "matcha vs coffee"
+- Fetches top 2 articles for depth
+- Produces: SEO title, meta description, 1,200-word blog post with H2s, CTA, keyword list
+
+---
+
+### Example 2 – Instagram Post
+
+User prompt:
+> Create social content for keyword "sustainable fashion tips", platform: social, channel: Instagram, tone: inspirational
+
+Claude's process:
+- Searches: "sustainable fashion tips trending", "eco fashion viral posts"
+- Produces: scroll-stopping hook, 200-word caption, 8 hashtags, CTA
+
+---
+
+### Example 3 – LinkedIn Post
+
+User prompt:
+> Keyword: "AI in healthcare", platform: social, channel: LinkedIn
+
+Claude's process:
+- Searches for recent developments, stats, executive perspectives
+- Produces: thought-leadership post with data point hook, 3 insights, soft CTA, 4 hashtags
+
+---
+
+## Quality Checklist (run before presenting output)
+
+**SEO (web):**
+- [ ] Primary keyword in title, H1, first paragraph, at least 2 H2s
+- [ ] Meta description is 150-160 chars and contains keyword
+- [ ] No keyword stuffing (density ~1-2%)
+- [ ] Includes internal link suggestion and at least 1 external authority link mention
+- [ ] Readability: short sentences, active voice, no jargon walls
+
+**Social:**
+- [ ] Hook is in the first line (no "In today's world..." openers)
+- [ ] CTA is specific ("Comment below", "Save this post", "Click the link in bio")
+- [ ] Hashtags are relevant (not just popular)
+- [ ] Fits character/word limit for channel
+- [ ] Emojis used purposefully (not excessively)
+
+---
+
+## Reference Files
+
+- `references/seo-rules.md` — Detailed SEO writing rules, on-page checklist, keyword placement guide
+- `references/social-rules.md` — Per-channel social media rules, hook formulas, hashtag strategy
